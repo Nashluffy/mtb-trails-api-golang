@@ -8,10 +8,6 @@ import (
 	"strings"
 )
 
-var (
-	trails []Trail
-)
-
 type Trail struct {
 	Name   string `json:"trail"`
 	Status string `json:"status"`
@@ -60,6 +56,10 @@ func newTrail(e *colly.HTMLElement) Trail {
 }
 
 func FetchTrailStatus() []Trail {
+	var (
+		trails []Trail
+	)
+
 	c := colly.NewCollector()
 
 	// On every a element which has tr attribute call callback
