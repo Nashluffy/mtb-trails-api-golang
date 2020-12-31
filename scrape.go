@@ -15,7 +15,29 @@ type Trail struct {
 	Link   string `json:"trail_info"`
 }
 
-func newTrail(e *colly.HTMLElement) Trail {
+func NewTrail(name string, status string, date string, link string) Trail {
+
+
+	// Some of the trails have a weird character thrown in as they are sub-trails, but we just treat them as normal
+	re, err := regexp.Compile(`[^A-Za-z0-9 - ( )]`)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	name = re.ReplaceAllString(name, " ")
+
+	t := Trail{
+		Date:   date,
+		Name:   strings.TrimSpace(name),
+		Link:   link,
+		Status: strings.TrimSpace(status),
+	}
+	return t
+}
+
+func parseColly(e *colly.HTMLElement) [4]string{
+
 	var (
 		name string
 		status string
@@ -36,28 +58,14 @@ func newTrail(e *colly.HTMLElement) Trail {
 
 	page := e.ChildAttr("a", "href")
 	link = fmt.Sprintf("%s%s", "https://www.trianglemtb.com/", page)
-
-	// Some of the trails have a weird character thrown in as they are sub-trails, but we just treat them as normal
-	re, err := regexp.Compile(`[^A-Za-z0-9 - ( )]`)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	name = re.ReplaceAllString(name, " ")
-
-	t := Trail{
-		Date:   date,
-		Name:   strings.TrimSpace(name),
-		Link:   link,
-		Status: strings.TrimSpace(status),
-	}
-	return t
+	results := [4]string{name, status, date, link}
+	return results
 }
 
 func FetchTrailStatus() []Trail {
 	var (
 		trails []Trail
+		elements [4]string
 	)
 
 	c := colly.NewCollector()
@@ -76,7 +84,8 @@ func FetchTrailStatus() []Trail {
 			return
 		}
 
-		currentTrail := newTrail(e)
+		elements = parseColly(e)
+		currentTrail := NewTrail(elements[0], elements[1], elements[2], elements[3])
 
 		trails = append(trails, currentTrail)
 	})
