@@ -14,27 +14,19 @@ type metadata struct {
 
 type response struct {
 	Metadata metadata `json:"metadata"`
-	Data []Trail  `json:"data"`
+	Data []trail  `json:"data"`
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("%s connected with %s", r.RemoteAddr, r.Header.Get("User-Agent"))
 
-	var (
-		trails []Trail
-		responseMetadata metadata
-		finalResponse response
-	)
+	trails := FetchTrailStatus()
 
-	trails = FetchTrailStatus()
-
-	responseMetadata = metadata {
-		Timestamp: time.Now().Format("2006.01.02 15:04:05"),
-	}
-
-	finalResponse = response {
-		Metadata: responseMetadata,
-		Data:     trails,
+	finalResponse := response {
+		Metadata: metadata {
+			Timestamp: time.Now().Format("2006.01.02 15:04:05"),
+		},
+		Data: trails,
 	}
 
 	marshaledResponse, err := json.MarshalIndent(finalResponse, "", "  ")

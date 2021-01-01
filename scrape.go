@@ -8,15 +8,14 @@ import (
 	"strings"
 )
 
-type Trail struct {
+type trail struct {
 	Name   string `json:"trail"`
 	Status string `json:"status"`
 	Date   string `json:"last_updated"`
 	Link   string `json:"trail_info"`
 }
 
-func NewTrail(name string, status string, date string, link string) Trail {
-
+func NewTrail(name string, status string, date string, link string) trail {
 
 	// Some of the trails have a weird character thrown in as they are sub-trails, but we just treat them as normal
 	re, err := regexp.Compile(`[^A-Za-z0-9 - ( )]`)
@@ -26,8 +25,9 @@ func NewTrail(name string, status string, date string, link string) Trail {
 	}
 
 	name = re.ReplaceAllString(name, " ")
+	status = strings.ToLower(status)
 
-	t := Trail{
+	t := trail{
 		Date:   date,
 		Name:   strings.TrimSpace(name),
 		Link:   link,
@@ -36,36 +36,28 @@ func NewTrail(name string, status string, date string, link string) Trail {
 	return t
 }
 
-func parseColly(e *colly.HTMLElement) [4]string{
+func parseColly(e *colly.HTMLElement) []string{
 
 	var (
-		name string
-		status string
-		date string
-		link string
-		elements []string
+		results []string
 	)
 
 	// Maybe colly has some native support for what I'm doing, but I couldn't find it
 	e.ForEach("td", func(_ int, td *colly.HTMLElement){
-		elements = append(elements, td.Text)
+		results = append(results, td.Text)
 	})
 
-	// All trails follow the same order of name, status, and date
-	name = elements[0]
-	status = strings.ToLower(elements[1])
-	date = elements[2]
 
 	page := e.ChildAttr("a", "href")
-	link = fmt.Sprintf("%s%s", "https://www.trianglemtb.com/", page)
-	results := [4]string{name, status, date, link}
+	link := fmt.Sprintf("%s%s", "https://www.trianglemtb.com/", page)
+
+	results = append(results, link)
 	return results
 }
 
-func FetchTrailStatus() []Trail {
+func FetchTrailStatus() []trail {
 	var (
-		trails []Trail
-		elements [4]string
+		trails []trail
 	)
 
 	c := colly.NewCollector()
@@ -84,7 +76,7 @@ func FetchTrailStatus() []Trail {
 			return
 		}
 
-		elements = parseColly(e)
+		elements := parseColly(e)
 		currentTrail := NewTrail(elements[0], elements[1], elements[2], elements[3])
 
 		trails = append(trails, currentTrail)
