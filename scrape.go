@@ -38,9 +38,7 @@ func NewTrail(name string, status string, date string, link string) trail {
 
 func parseColly(e *colly.HTMLElement) []string{
 
-	var (
-		results []string
-	)
+	var results []string
 
 	// Maybe colly has some native support for what I'm doing, but I couldn't find it
 	e.ForEach("td", func(_ int, td *colly.HTMLElement){
@@ -56,10 +54,8 @@ func parseColly(e *colly.HTMLElement) []string{
 }
 
 func FetchTrailStatus() []trail {
-	var (
-		trails []trail
-	)
 
+	trails []trail
 	c := colly.NewCollector()
 
 	// On every a element which has tr attribute call callback
