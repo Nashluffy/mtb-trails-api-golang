@@ -38,8 +38,10 @@ func NewTrail(name string, status string, date string, link string, notes string
 	return t
 }
 
+
 func parseColly(e *colly.HTMLElement) (details []string){
 	var note string
+
 	// Maybe colly has some native support for what I'm doing, but I couldn't find it
 	e.ForEach("td", func(_ int, td *colly.HTMLElement){
 		nAttr := td.Attr("onclick")
@@ -59,11 +61,11 @@ func parseColly(e *colly.HTMLElement) (details []string){
 }
 
 func FetchTrailStatus() []trail {
-	var (
-		trails []trail
-	)
+
 
 	notes := make(map[string]string)
+	var trails []trail
+
 	c := colly.NewCollector()
 
 	// It's not pretty - but we need to build up the map of all notes before
