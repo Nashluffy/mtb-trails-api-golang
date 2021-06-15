@@ -11,10 +11,12 @@ WORKDIR /go/src/github.com/Nashluffy/mtb-trails-api-golang
 # (You may fetch or manage dependencies here,
 # either manually or with a tool like "godep".)
 RUN go get
-RUN go install github.com/Nashluffy/mtb-trails-api-golang
-
-# Run the outyet command by default when the container starts.
-ENTRYPOINT /go/bin/trails-api
+RUN go build .
 
 # Document that the service listens on port 8080.
 EXPOSE 8080
+
+# Run the outyet command by default when the container starts.
+ENTRYPOINT /go/bin/mtb-trails-api-golang
+
+
