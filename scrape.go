@@ -94,7 +94,9 @@ func FetchTrailStatus() []trail {
 		trails = append(trails, currentTrail)
 	})
 
-	c.Visit("https://www.trianglemtb.com/mobiletrailstatus.php")
+	if err := c.Visit("https://www.trianglemtb.com/mobiletrailstatus.php"); err != nil {
+		fmt.Print(err)
+	}
 
 	return trails
 }
